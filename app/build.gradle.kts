@@ -44,5 +44,5 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.retrofit)
     implementation(libs.converter.scalars)
-    implementation(libs.molecule.runtime)
+    implementation(libs.rin)
 }

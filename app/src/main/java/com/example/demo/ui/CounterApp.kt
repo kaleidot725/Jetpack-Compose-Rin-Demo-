@@ -20,15 +20,13 @@ import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun CounterApp(
-    modelFlow: Flow<CounterModel>,
+    model: CounterModel,
     onIncreaseOne: () -> Unit,
     onIncreaseTen: () -> Unit,
     onDecreaseOne: () -> Unit,
     onDecreaseTen: () -> Unit,
     onRandomize: () -> Unit
 ) {
-    val model by modelFlow.collectAsState(CounterModel())
-
     Column {
         Box(
             modifier = Modifier
