@@ -1,11 +1,6 @@
 <h1 align="center">
-    Jetpack-Compose-Molecule-Demo
+    Jetpack-Compose-Rin-Demo
 </h1>
-
-<h3 align="center">
-    !! This application is created with reference to the Molecule sample application !!
-    https://github.com/cashapp/molecule/tree/trunk/sample
-</h3>
 
 <h3 align="center">
     <img align="center" width=399 src="./docs/sample.gif" vspace="30">
@@ -21,7 +16,7 @@ This application has next features.
 
 ## 🏢Implementation
 
-This application is implemented by molecule.
+This application is implemented by rin.
 
 ![](./docs/architecture.drawio.svg)
 
@@ -35,19 +30,20 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val event = MutableSharedFlow<CounterEvent>()
-        val modelFlow: Flow<CounterModel> = scope.launchMolecule(mode = RecompositionMode.Immediate) {
-            CounterPresenter(event, randomService)
-        }
-
         setContent {
+            val events = remember { MutableSharedFlow<CounterEvent>() }
+            val model = CounterPresenter(
+                events = events,
+                randomService = randomService,
+            )
+
             CounterApp(
-                modelFlow = modelFlow,
-                onIncreaseOne = { scope.launch { event.emit(Change(1)) } },
-                onIncreaseTen = { scope.launch { event.emit(Change(10)) } },
-                onDecreaseOne = { scope.launch { event.emit(Change(-1)) } },
-                onDecreaseTen = { scope.launch { event.emit(Change(-10)) } },
-                onRandomize = { scope.launch { event.emit(Randomize) } }
+                model = model,
+                onIncreaseOne = { scope.launch { events.emit(Change(1)) } },
+                onIncreaseTen = { scope.launch { events.emit(Change(10)) } },
+                onDecreaseOne = { scope.launch { events.emit(Change(-1)) } },
+                onDecreaseTen = { scope.launch { events.emit(Change(-10)) } },
+                onRandomize = { scope.launch { events.emit(Randomize) } }
             )
         }
     }
@@ -55,15 +51,13 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun CounterApp(
-    modelFlow: Flow<CounterModel>,
+    model: CounterModel,
     onIncreaseOne: () -> Unit,
     onIncreaseTen: () -> Unit,
     onDecreaseOne: () -> Unit,
     onDecreaseTen: () -> Unit,
     onRandomize: () -> Unit
 ) {
-    val model by modelFlow.collectAsState(CounterModel())
-
     Column {
         Box(
             modifier = Modifier
@@ -110,9 +104,10 @@ fun CounterApp(
         }
     }
 }
+
 ```
 
-### Molecule Presenter(Using Jetpack Compose)
+### Presenter(Using Jetpack Compose)
 
 ```kotlin
 sealed interface CounterEvent
@@ -129,8 +124,8 @@ fun CounterPresenter(
     events: Flow<CounterEvent>,
     randomService: RandomService,
 ): CounterModel {
-    var count by remember { mutableStateOf(0) }
-    var loading by remember { mutableStateOf(false) }
+    var count by rememberRetained { mutableIntStateOf(0) }
+    var loading by rememberRetained { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         events.collect { event ->
@@ -199,23 +194,23 @@ interface RandomService {
 
 This application uses the libraries below.
 
-| Name                  | Link                                                         |
-| --------------------- | ------------------------------------------------------------ |
-| Jetpack Compose       | https://developer.android.com/jetpack/compose                |
-| Molecule              | https://github.com/cashapp/molecule                          |
-| OkHttp                | https://square.github.io/okhttp/                             |
-| Retrofit              | https://square.github.io/retrofit/                           |
+| Name            | Link                                                         |
+|-----------------| ------------------------------------------------------------ |
+| Jetpack Compose | https://developer.android.com/jetpack/compose                |
+| Rin             | https://github.com/takahirom/Rin                          |
+| OkHttp          | https://square.github.io/okhttp/                             |
+| Retrofit        | https://square.github.io/retrofit/                           |
 
 ## ⭐Reference
 
-| Name                                                         | Link                                                         |
-| ------------------------------------------------------------ | ------------------------------------------------------------ |
-| Molecule \| README | https://github.com/cashapp/molecule/blob/trunk/README.md |
+| Name          | Link                              |
+|---------------|-----------------------------------|
+| Rin \| README | https://github.com/takahirom/Rin/blob/main/README.md |
 
 ## 💡License
 
 ```
-Copyright (c) 2022 Yusuke Katsuragawa
+Copyright (c) 2024 Yusuke Katsuragawa
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
